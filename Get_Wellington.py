@@ -23,5 +23,5 @@ def wellington():
             names.append(name)
         else:
             dates.append(text.text.strip())
-    consults_list = [[names[i], [],  dates[i], []] for i in range(len(names))]
+    consults_list = [[names[i], "",  dates[i], "", []] for i in range(len(names))]
     return consults_list
