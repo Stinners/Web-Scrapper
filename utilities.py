@@ -21,14 +21,14 @@ def get_text(tag):
     return(lines)
 
 def add_elem(array, elem):
-    """ Adds an element to a list of non empty
+    """ Adds an element to a list if non empty
     used when searches could return blank feilds"""
     if elem != '':
         array.append(elem)
     return(array)
 
 def clean(text):
-    """ Removes all the sepecial characters from a string"""
+    """ Removes all the special characters from a string"""
     special = "\n\t"
     # remove while space and special characters at the begining
     # and end of the string
@@ -52,21 +52,21 @@ def clean(text):
 def tag_submissions(sub_list, tag_name, tag_keys):
     """ Reads through a list of submissions and adds the tag 'tag_name'
         if any of the strings, in 'tag_keys' are found in the the name or
-        other information.
-        Note keywords should be all lower case """
+        other information. Case insensitive """
 
     for sub in sub_list:
         sub_name = sub[0].lower()
         extra_info = sub[3].lower()
 
         for key in tag_keys:
+            key = key.lower()
             if (key in sub_name or key in extra_info):
                 sub[4].append(tag_name)
                 break
 
     return sub_list
 
-# Write output to a JSON file 
+################# Write output to a JSON file ###################
 
 def print_json(filename, pairs, pretty=False):
     import json
