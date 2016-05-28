@@ -65,3 +65,34 @@ def tag_submissions(sub_list, tag_name, tag_keys):
                 break
 
     return sub_list
+
+# Write output to a JSON file 
+
+def print_json(filename, pairs, pretty=False):
+    import json
+
+    data = {pair[0] : make_dict(pair[1]) for pair in pairs}
+
+    with open(filename, "w") as outfile:
+        if pretty:        # Print human readible output
+            json.dump(data, outfile, ensure_ascii = False, indent = 4)
+        else:             # Prinit minimal size output
+            json.dump(data, outfile, ensure_ascii = False)
+
+
+def make_single_dict(sub):
+    """ Takes a single consultation list and returns a dict in which each of the
+        feilds point to their value. Note that the name is not included """
+    out_dict = {"Link" : sub[1],
+                "Date" : sub[2],
+                "Info" : sub[3],
+                "Tags" : sub[4]}
+    return out_dict
+
+def make_dict(subs_list):
+    """ Takes a list of consultations and returns a dict in which
+        the name indexes a sub dict of feilds which each index their values """
+
+    out_dict = {sub[0]: make_single_dict(sub) for sub in subs_list}
+
+    return out_dict

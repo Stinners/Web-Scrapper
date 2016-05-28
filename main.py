@@ -3,7 +3,7 @@
 # main file to handle the high level function calls
 
 import get                               # header importing functions that retrive and parse the data for each region
-from utilities import tag_submissions
+from utilities import tag_submissions, print_json
 
 # Each 'get' function returns a list of consultations, each consultation is iself
 # represented as a list in the format:
@@ -14,12 +14,18 @@ from utilities import tag_submissions
 # Some may be returned empty depending on what is on the webpage
 # Currently the tags list is returned empty and populated by a seperate function.
 
+# Will need to bundle the processing that is done for each webpage in some way
+# rather than having 3+ seperate calls for each page.
+
 if __name__ == "__main__":
 
     chch_consults = get.christchurch()
     well_consults = get.wellington()
 
     chch_consults = tag_submissions(chch_consults, "Transport", ["parking", "cycling"])
+    well_consults = tag_submissions(well_consults, "Transport", ["parking", "cycling"])
 
-    for consult in chch_consults:
-        print(consult[0] + " Tags: " + str(consult[4]))
+    print_json("output.json",
+                [("Christchurch", chch_consults),
+                ("Wellington", well_consults)],
+                pretty = True)
