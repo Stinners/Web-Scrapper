@@ -1,6 +1,7 @@
 
-$(document).ready(function() {
+$(document).ready(
 
+function() {
     $('.button').click( function() {
         var $list = $("#list");
         $list.empty();     // Clear anything currently in the list
@@ -12,16 +13,12 @@ $(document).ready(function() {
             $list.append("<p class=submission>" + subs[i]["Name"] + "</p>");
             $list.append('<br>');
         }
-    });
+});
+
 });
 
 var contains = function(value, list) {
-    if (list.indexOf(value) == -1) {
-        return false;
-    } else {
-        return true;
-    }
-}
+    return (list.indexOf(value) == -1); }
 
 var get_checked = function(id) {
     output = [];
@@ -41,7 +38,6 @@ var get_submissions = function(cities, tags) {
         var cities_pred = function(city) { return contains(city, cities); };
     }
 
-
     if (tags.length === 0) {
         var tags_pred = function(tag_list) { return true; };
     } else {
@@ -58,6 +54,7 @@ var get_submissions = function(cities, tags) {
     }
 
     // Loop over all submissions and push the selected ones into 'output'
+    // rewrite this using 'filter'
     var output = [];
     for (city in data) {
         if (cities_pred(city)) {
