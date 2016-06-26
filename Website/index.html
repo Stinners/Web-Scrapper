@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <head>
+        <meta charset="utf-8">
+        <title>Submissions</title>
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.1.min.js"></script>  <!-- Getting jQuery -->
+        <script type='text/javascript' src='./script.js'></script>
+        <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css">                         <!-- CSS reset -->
+        <link rel="stylesheet" href="./style.css">
+    </head>
+
+    <body>
+        <p> Select the city and tags you want to see </p>
+
+        <h5> City </h5>
+        <form id='city-check'>
+            <input type="checkbox" name="city" value="All">
+            All<br>
+            <input type="checkbox" name="city" value="Christchurch">
+            Christchurch<br>
+            <input type="checkbox" name="city" value="Wellington">
+            Wellingon<br>
+        </form>
+
+        <h5> Tag </h5>
+        <form id='tag-check'>
+            <input type="checkbox" name="tag" value="Transport">
+            Transport<br>
+        </form>
+
+        <div class="button"> Show </div>
+        <div id='list'> Select the Cities you want to see and any tags you want to restrict the seach to and then click 'Show' </div>
+    </body>
+</html>

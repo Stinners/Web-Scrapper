@@ -1,0 +1,16 @@
+h5 {
+    padding: 10px 0px 10px 15px;
+}
+
+.button {
+    width: 60px;
+    text-align: center;
+    height: 25px;
+    margin: 25px;
+    padding-top: 5px;
+    background-color: #428BCA;
+}
+
+.button:hover {
+    background-color: #3071A9;
+}
