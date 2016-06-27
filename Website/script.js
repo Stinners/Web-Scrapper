@@ -18,7 +18,7 @@ function() {
 });
 
 var contains = function(value, list) {
-    return (list.indexOf(value) == -1); }
+    return (list.indexOf(value) !== -1); }
 
 var get_checked = function(id) {
     output = [];
