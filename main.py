@@ -2,30 +2,42 @@
 
 # main file to handle the high level function calls
 
-import get                               # header importing functions that retrive and parse the data for each region
-from utilities import tag_submissions, print_json
-
-# Each 'get' function returns a list of consultations, each consultation is iself
+# Each 'get' function returns a list of consultations, each consultation is itself
 # represented as a list in the format:
 #
 #     [name, link, date, extra_info, tags]
 #
-# The first 4 feilds are strings and the last a list of strings
-# Some may be returned empty depending on what is on the webpage
+# name, link and extra_info are strings strings and tags is as empty list
+# Other feilds may be returned empty depending on what's on the webpage
 # Currently the tags list is returned empty and populated by a seperate function.
 
-# Will need to bundle the processing that is done for each webpage in some way
-# rather than having 3+ seperate calls for each page.
+# The date is a raw python datetime object
+
+import datetime
+import pickle
+from utilities import tag_submissions, check_size
+import get                                            # header importing functions that retrive and parse the data for each region
+
+
+def process_cities(*get_functions):
+    """ Calls each 'get.city' function in turn and then applies tagging functions
+        returns the list containing all the output  """
+    results = []
+    for get_city in get_functions:
+        city = get_city.__name__
+        subs = get_city()
+        for sub in subs:
+            check_size(sub)         # checking none on the feilds are too big for the database
+        subs = tag_submissions(subs, "transport", ["parking", "cycling"])
+        results.append( (city, subs) )
+    return results
 
 if __name__ == "__main__":
 
-    chch_consults = get.christchurch()
-    well_consults = get.wellington()
+    consults = process_cities(get.christchurch,
+                              get.wellington)
 
-    chch_consults = tag_submissions(chch_consults, "Transport", ["parking", "cycling"])
-    well_consults = tag_submissions(well_consults, "Transport", ["parking", "cycling"])
-
-    print_json("output.json",
-                [("Christchurch", chch_consults),
-                ("Wellington", well_consults)],
-                pretty = True)
+    # Find a better way to send this to the Django db
+    File = open("output.txt", 'wb')
+    pickle.dump(consults, File)
+    File.close()

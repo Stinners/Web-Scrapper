@@ -7,6 +7,7 @@ __pycache__/
 *.yaml
 *.json
 
+
 # C extensions
 *.so
 
@@ -55,6 +56,7 @@ coverage.xml
 
 # Django stuff:
 *.log
+Website/django_site/settings_secret.py
 
 # Sphinx documentation
 docs/_build/
