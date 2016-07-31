@@ -1,0 +1,35 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <head>
+        <meta charset="utf-8">
+        <title>Submissions</title>
+        <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css">                         <!-- CSS reset -->
+        <link rel="stylesheet" href="{%static 'get_data/style.css'%}"/>
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.1.min.js"></script>  <!-- Getting jQuery -->
+        <script type='text/javascript' src="{%static 'get_data/script.js'%}"></script>
+    </head>
+
+    <body>
+        <p> Select the city and tags you want to see </p>
+
+        <select id='cities'>
+            <option value="all">All</option>
+            {% for city in cities %}
+                <option value={{ city }}>{{ city|title }}</option>
+            {% endfor %}
+        </select>
+
+        <select id='tags'>
+            <option value="all">All</option>
+            {% for tag in tags %}
+                <option value={{ tag }}>{{ tag|title }}</option>
+            {% endfor %}
+        </select>
+
+        <div class="button"> Show </div>
+        <div id='list'> Select the Cities you want to see and any tags you want to restrict the seach to and then click 'Show' </div>
+    </body>
+</html>
