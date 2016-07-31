@@ -1,8 +1,4 @@
 
-# Need to rewrite this to remove the get_or_create in send_data. This Will
-# require either making sure all the tags are always in the database or
-# that the template only adds the availible tags to the drop down menues
-
 
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -31,14 +27,15 @@ def index(request):
     context_dict = {'cities': cities, 'tags': tags}
     return render(request, 'get_data/index.html', context=context_dict)
 
-def send_data(request, city_name, tag):
+def send_data(request, city_name, tag_str):
     # Get the requested submissions
-    subs = Submission.objects
-    if tag != "all":
-        tag, _ = Tag.objects.get_or_create(tag_name = tag)
+    subs = Submission.objects.all()
+    if tag_str != "all":
+        tag = Tag.objects.get(tag_name = tag_str)   
         subs = subs.filter(tags = tag)
     if city_name != "all":
         subs = subs.filter(city = city_name)
+    #if city_name = "all" and tag_str == "all":
     # Compose them into a json response
     response = {}
     for sub in subs:
