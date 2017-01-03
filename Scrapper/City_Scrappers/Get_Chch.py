@@ -1,4 +1,4 @@
-#Currently just returning an empty feild for extra infro for Chch
+# Currently just returning an empty feild for extra infro for Chch
 # getting this will require following the link to each individual
 # consultation page and extracting the text from there
 
@@ -18,9 +18,13 @@ chch_adress = "http://www3.ccc.govt.nz/CCC.Web.ProjectInfo/"
 def christchurch():
     try:
         soup = get_html(chch_adress)
-    except ValueError:
-        return("Invalid Adress: Christchurch")
-    table = soup.find("table").find_all("td")
+    except ValueError:         # Cannot retreive html
+        print("Invalid Adress: Christchurch")
+        return []
+    try:
+        table = soup.find("table").find_all("td")
+    except AttributeError:    # No currently open consultations
+        return []
     names = []; links = []; info = []; dates = []
 
     for row in table:
@@ -67,9 +71,8 @@ def process_date(date):
     try:
         date_obj = datetime.datetime.strptime(date, "%d/%m/%Y %I:%M%p")
     except:
-        import sys
         print("Could not read date in Christchurch data")
         print(date)
-        sys.exit()
+        import sys; sys.exit()
 
     return date_obj

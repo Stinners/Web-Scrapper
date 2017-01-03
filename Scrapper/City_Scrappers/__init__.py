@@ -1,0 +1,3 @@
+from City_Scrappers.Get_Chch import christchurch
+from City_Scrappers.Get_Wellington import wellington
+from City_Scrappers.Get_Dunedin import dunedin
