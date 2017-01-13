@@ -1,0 +1,143 @@
+#! /usr/bin/env python3
+
+# This file contains functions for interacting with the database
+
+# start and stop the server using
+# /etc/init.d/mysql start
+# /etc/init.d/mysql stop
+
+import datetime
+import pickle
+from contextlib import contextmanager
+from peewee import (CharField, TextField, DateTimeField, ForeignKeyField,
+                    MySQLDatabase, Model)
+
+import local_config as local
+
+db = MySQLDatabase(local.db_name,
+                   host=local.host,
+                   user=local.user,
+                   passwd=local.passwd)
+
+class BaseModel(Model):
+    """ The internal class Meta specifies that this model corresponds
+    to a table in the database 'db', we can then allow all other tables
+    in bd to inherit from this class """
+    class Meta:
+        database = db
+
+# Models
+
+class Submission(BaseModel):
+    name       = TextField()
+    city       = TextField()
+    link       = TextField()
+    date       = DateTimeField()
+    extra_info = TextField()
+
+class Tag(BaseModel):
+    tag = CharField(max_length=50)
+
+# This tables stores the relationships bewteen
+# the submissions and tags
+class Submission_Tag(BaseModel):
+    sub = ForeignKeyField(Submission)
+    tag = ForeignKeyField(Tag)
+
+###### Functions for interacting with Database
+
+# Write some tests
+
+# Find a better way to handle connections
+# Figure out how the flask api works
+# or possibly use decorators
+@contextmanager
+def use_db():
+    db.connect()
+    yield db
+    db.close
+
+def create_tables():
+    with use_db() as db:
+        db.create_tables([Submission, Tag, Submission_Tag])
+
+def delete_tables():
+    with use_db() as db:
+        db.drop_tables([Submission, Tag, Submission_Tag])
+
+def insert_sub(sub, city):
+    """ Adds an entry for a submission to the database along with the
+        correct connections for tagging """
+     #sub has format [name, link, date, extra_info, tags]
+
+    with use_db() as db:
+         # check if the sub is already in the db, return if it does
+        query = Submission.select().where(Submission.name == sub[1])
+        if query.exists():
+            return 0
+
+        # if it doesn't exists add the entry
+        new_sub = Submission.create(name = sub[0],
+                                    link = sub[1],
+                                    date = sub[2],
+                                    extra_info = sub[3],
+                                    city = city)
+
+        # Check for any new tags in the sub and add if nessecary
+        # Then update the many-to-many relationship table
+        for sub_tag in sub[4]:
+            tag_query = Tag.select().where(Tag.tag == sub_tag)
+            if not tag_query.exists():
+                Tag.create(tag = sub_tag)
+
+            Submission_Tag.create(sub=new_sub, tag=tag_query.get())
+
+def clean_db():
+    """ Removes all the submissions that have closed and the coressponding
+    Submission_Tag Rows """
+    now = datetime.datetime.now()
+    with use_db() as db:
+        for sub in Submission.select():
+            if now > sub.date:
+                Submission_Tag.delete().where(sub == sub)
+                sub.delete_instance()
+
+def unpickle(filepath):
+    with open(filepath, 'rb') as f:
+        return pickle.load(f)
+
+def add_submissions(subs_dic):
+    """ Takes the dict of submissions produced by process_cities and
+        the output in the database"""
+    for (city, subs) in subs_dic.items():
+        for sub in subs:
+            insert_sub(sub, city)
+
+def get_city(query, city_name):
+    """ This function takes a city and a query and returns the query with a
+        filter by city name applied """
+    query.where(Submission.city == city_name)
+    return query
+
+def get_tag(query, tag):
+    return (query.join(Submission_Tag)
+                 .join(Tag)
+                 .where(Tag.tag == tag))
+
+ #sub has format [name, link, date, extra_info, tags]
+def unpack_sub(sub):
+    # May be best to convert datetime to string here
+    return [sub.name, sub.link, sub.date, sub.extra_info]
+
+def get_subs(city, tag):
+    """ Main interface for retreiving submissions from the db takes a
+        city name and tag and returns the subs that satify that criteria.
+        Either of these arguments can be repaced with None to return all
+        tags or cities. """
+    with use_db() as db:
+        query = Submission.select()
+        if city != None:
+            query = get_city(query, city)
+        if tag != None:
+            query = get_tag(query, tag)
+        return [unpack_sub(sub) for sub in query]
