@@ -1,10 +1,16 @@
-# Note Wellington has a "featured consultation" that this script doesn't
-# retreive
+# Note wellington has its submissions divided into two sections, 'featured submissions'
+# Currenly this script seems to be working for the featured submissions, however the
+# regular submissions seem to me missing links to individual feedback pages
 
 from datetime import datetime
 from utilities import get_html, add_elem, clean
 
+# Adress of the main page with the list of submissions
 well_adress = "http://wellington.govt.nz/have-your-say/consultations"
+
+# prfeix to be applied to each of the links on the submission page to give the full
+# url for the individual submission pages
+domain = "http://wellington.govt.nz"
 
 def wellington():
 
@@ -19,7 +25,9 @@ def wellington():
     featured = soup.findAll("div", {"class": "feature"})
     for div in featured:
         content = div.find('a')
-        links.append(well_adress + content.get('href'))
+        # Account for the fact that some links point to other WCC pages and
+        # some go to survey monkey pages
+        links.append(make_link(content.get('href')))
         date_string = content.find("div", {"class": "feature-date"}).text
         dates.append(parse_date(date_string))
         names.append(content.find('h2').text)
@@ -47,7 +55,13 @@ def wellington():
     # return an empty list if there are not open consultations other than the featured one
     return consults_list
 
-time = '\nCloses 5.00p.m. 30\xa0January\xa02017\n'
+def make_link(href):
+    if href.startswith("http"):
+        return href
+    else:
+        return domain + href
+
+
 def parse_date(date_string):
     # Interprets the date format presented in the featured consultations
     _, time, day, month, year = date_string.split()
