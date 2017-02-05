@@ -7,8 +7,7 @@
 # /etc/init.d/mysql stop
 
 import datetime
-import pickle
-from contextlib import contextmanager
+import json
 from peewee import (CharField, TextField, DateTimeField, ForeignKeyField,
                     MySQLDatabase, Model)
 
@@ -28,6 +27,8 @@ class BaseModel(Model):
 
 # Models
 
+# Possible reimpliment cities as a forign key
+
 class Submission(BaseModel):
     name       = TextField()
     city       = TextField()
@@ -45,12 +46,6 @@ class Submission_Tag(BaseModel):
     tag = ForeignKeyField(Tag)
 
 ###### Functions for interacting with Database
-
-# Write some tests
-
-# Find a better way to handle connections
-# Figure out how the flask api works
-# or possibly use decorators
 
 def create_tables(this_db):
     this_db.create_tables([Submission, Tag, Submission_Tag])
@@ -103,10 +98,6 @@ def clean_db():
             Submission_Tag.delete().where(sub == sub)
             sub.delete_instance()
 
-def unpickle(filepath):
-    with open(filepath, 'rb') as f:
-        return pickle.load(f)
-
 def add_subs(subs_dic):
     """ Takes the dict of submissions produced by process_cities and
         saves the output to the database"""
@@ -135,8 +126,20 @@ def get_subs(city, tag):
         Either of these arguments can be repaced with 'any' to return all
         tags or cities. """
     query = Submission.select()
-    if city != "any":
+    if city != "All":
         query = get_city(query, city)
-    if tag != "any":
+    if tag != "All":
         query = get_tag(query, tag)
     return [unpack_sub(sub) for sub in query]
+
+def get_json(city, tag):
+    subs = get_subs(city, tag)
+    for sub in subs:
+        sub[2] = sub[2].strftime("%x %I:%M%p")
+    return json.dumps(subs)
+
+def get_cities_and_tags():
+    """ Returns a list of all unique cities and tags in the database """
+    cities = set([sub.city for sub in Submission.select()])
+    tags = set([tag.tag for tag in Tag])   # Tags are unique but returning as a set for consitency with cities
+    return cities, tags

@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+# Starts the development server
+
+export FLASK_APP=routes.py 
+flask run

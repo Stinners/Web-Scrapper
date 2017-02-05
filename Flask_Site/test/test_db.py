@@ -3,6 +3,8 @@
 # python3 -m unittest
 # from Flask_Site
 
+# Add some tests to ensure the tags are managed properly
+
 import unittest
 from datetime import datetime
 
