@@ -39,8 +39,8 @@ if __name__ == "__main__":
     consults = process_cities(get.christchurch,
                               get.wellington)
 
-    # Find a better way to send thie to the Django db
+    # Find a better way to send thie to the db
     # The simplest way would just be JSON with a key for security
-    # Probably just run the seach on the server
+    # Probably just run the search on the server
     with open("../output.txt", "wb") as File:
         pickle.dump(consults, File)

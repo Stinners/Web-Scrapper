@@ -5,6 +5,9 @@
 
 # Add some tests to ensure the tags are managed properly
 
+# Problem currentluy is that the database targeted is determined bu the models in db.py which
+# all inherit from a meta class that just laods the data from that file
+
 import unittest
 from datetime import datetime
 
@@ -66,9 +69,9 @@ class TestDB(unittest.TestCase):
             self.assertCountEqual(db.get_subs(city, tag), results_list)
         return new_test
 
-    test_lookup_all = make_test("any", "any", [lion_sub, ollifant_sub, rail_sub])
-    test_look_tags = make_test("any", "wildlife", [lion_sub, ollifant_sub])
-    test_look_city = make_test("gondor", "any", [ollifant_sub, rail_sub])
+    test_lookup_all = make_test("all", "all", [lion_sub, ollifant_sub, rail_sub])
+    test_look_tags = make_test("all", "wildlife", [lion_sub, ollifant_sub])
+    test_look_city = make_test("gondor", "all", [ollifant_sub, rail_sub])
     test_city_and_tag = make_test("gondor", "wildlife", [ollifant_sub])
     test_find_nothing = make_test("utopia", "chamber pots", [])
 

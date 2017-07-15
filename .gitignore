@@ -3,13 +3,17 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Output files 
+# Output files
 *.yaml
 *.json
+*output.txt
 
 
 # C extensions
 *.so
+
+# local config details that shouldn't go to github
+*local_config.py
 
 # Distribution / packaging
 .Python
@@ -66,3 +70,9 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# Notes 
+notes.txt 
+
+# localenv folder 
+venv/

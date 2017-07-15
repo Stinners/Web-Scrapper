@@ -6,10 +6,14 @@
 # /etc/init.d/mysql start
 # /etc/init.d/mysql stop
 
+# Need to impliment connection polling
+
 import datetime
 import json
+import pickle
 from peewee import (CharField, TextField, DateTimeField, ForeignKeyField,
                     MySQLDatabase, Model)
+
 
 import local_config as local
 
@@ -21,7 +25,7 @@ db = MySQLDatabase(local.db_name,
 class BaseModel(Model):
     """ The internal class Meta specifies that this model corresponds
     to a table in the database 'db', we can then allow all other tables
-    in bd to inherit from this class """
+    in db to inherit from this class """
     class Meta:
         database = db
 
@@ -47,6 +51,7 @@ class Submission_Tag(BaseModel):
 
 ###### Functions for interacting with Database
 
+# Move migrations into a seperate file
 def create_tables(this_db):
     this_db.create_tables([Submission, Tag, Submission_Tag])
 
@@ -105,6 +110,17 @@ def add_subs(subs_dic):
         for sub in subs:
             insert_sub(sub, city)
 
+# Probably don't use this in production
+def get_subs_from_pickle(filepath):
+    """ Read in subs from a pickle file """
+    try:
+        with open(filepath, "rb") as infile:
+            subs = pickle.load(infile)
+    except FileNotFoundError:               # Think about how to handel this error
+        print("Could not read pickle file")
+        import sys; sys.exit()
+    return subs
+
 def get_city(query, city_name):
     """ This function takes a city and a query and returns the query with a
         filter by city name applied """
@@ -121,14 +137,14 @@ def unpack_sub(sub):
     return [sub.name, sub.link, sub.date, sub.extra_info]
 
 def get_subs(city, tag):
-    """ Main interface for retreiving submissions from the db takes a
-        city name and tag and returns the subs that satify that criteria.
+    """ Main interface for retreiving submissions from the db
+        Takes a city name and tag and returns the subs that satify that criteria.
         Either of these arguments can be repaced with 'any' to return all
         tags or cities. """
     query = Submission.select()
-    if city != "All":
+    if city.lower() not in ["any", "all"]:
         query = get_city(query, city)
-    if tag != "All":
+    if tag.lower() not in ["any", "all"]:
         query = get_tag(query, tag)
     return [unpack_sub(sub) for sub in query]
 
