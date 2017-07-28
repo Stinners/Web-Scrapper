@@ -152,6 +152,7 @@ def get_json(city, tag):
     subs = get_subs(city, tag)
     for sub in subs:
         sub[2] = sub[2].strftime("%x %I:%M%p")
+    print(json.dumps(subs))
     return json.dumps(subs)
 
 def get_cities_and_tags():

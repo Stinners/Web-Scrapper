@@ -7,14 +7,13 @@ function get_dropdown(id) {
     return box[box.selectedIndex].text
 }
 
-// Appends to the table on the page=
+// Appends to the table on the page
 function add_sub(sub, subs_list) {
     var content = document.createTextNode(subs[i][0]);
     subs_list.appendChild(content);
     var br = document.createElement("br");
     subs_list.appendChild(br);
 }
-
 
 subsRequest = new XMLHttpRequest();
 subsRequest.onreadystatechange = function(){
