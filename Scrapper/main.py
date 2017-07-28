@@ -39,7 +39,7 @@ if __name__ == "__main__":
     consults = process_cities(get.christchurch,
                               get.wellington)
 
-    # Find a better way to send thie to the db
+    # Find a better way to send this to the db
     # The simplest way would just be JSON with a key for security
     # Probably just run the search on the server
     with open("../output.txt", "wb") as File:
