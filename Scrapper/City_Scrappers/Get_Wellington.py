@@ -3,7 +3,7 @@
 # regular submissions seem to me missing links to individual feedback pages
 
 from datetime import datetime
-from utilities import get_html, add_elem, clean
+from utilities import get_html
 
 # Adress of the main page with the list of submissions
 well_adress = "http://wellington.govt.nz/have-your-say/consultations"
@@ -19,47 +19,15 @@ def wellington():
     except ValueError:
         return "Invalid Address: Wellington"
 
-    names = []; dates = []
-    links = []; info = []
-    # Get the featured consultations
-    featured = soup.findAll("div", {"class": "feature"})
-    for div in featured:
-        content = div.find('a')
-        # Account for the fact that some links point to other WCC pages and
-        # some go to survey monkey pages
-        links.append(make_link(content.get('href')))
-        date_string = content.find("div", {"class": "feature-date"}).text
-        dates.append(parse_date(date_string))
-        names.append(content.find('h2').text)
-        info.append(content.findAll('p')[1].text)
-
-    # This gets the non-featured consultations
-    # Note: are these missing links?
-    tables = soup.find("table")
-    if tables != None:
-        consults = tables.find_all("td")
-        names = []; dates = []
-        for i, text in enumerate(consults):
-            # retreiving the text out of the html tags and saving it
-            # each second line is the date of the preceding consultation
-            if (i % 2) == 0:
-                name = clean(text.text.strip())
-                names.append(name)
-                links.append("")
-                info.append("")
-            else:
-                dates.append(text.text.strip())
-
-    consults_list = [[names[i], links[i],  dates[i], info[i], []] for i in range(len(names))]
-
-    # return an empty list if there are not open consultations other than the featured one
-    return consults_list
-
-def make_link(href):
-    if href.startswith("http"):
-        return href
-    else:
-        return domain + href
+    consults = []
+    subs_containers = soup.find_all("div", class_="feature")
+    for sub in subs_containers:
+        name = sub.find("h2").text.strip()
+        date = parse_date(sub.find("p", class_="smaller").text)
+        link = domain + sub.find("a").get("href")
+        info = sub.find("div", class_="feature-content").find("p").text.strip()
+        consults.append([name, link, date, info, []])
+    return consults
 
 
 def parse_date(date_string):
